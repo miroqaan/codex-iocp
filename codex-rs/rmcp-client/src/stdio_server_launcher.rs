@@ -1,3 +1,4 @@
+// Modified by miroqaan: Windows MCP IOCP stdio patch, 2026-09-15.
 //! Launch MCP stdio servers and return the transport rmcp should use.
 //!
 //! This module owns the "where does the server process run?" decision:
@@ -300,7 +301,7 @@ impl LocalStdioServerLauncher {
 
         let spawn_transport = |command: Command| -> io::Result<(
             StdioServerTransportInner,
-            Option<tokio::process::ChildStderr>,
+            Option<crate::local_child::ChildStderr>,
             Option<u32>,
         )> {
             let (transport, stderr) =

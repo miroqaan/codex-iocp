@@ -1,3 +1,4 @@
+// Modified by miroqaan: Windows MCP IOCP stdio patch, 2026-09-15.
 //! Bounded, compatibility-aware transport for modern locally spawned MCP servers.
 
 use std::future::Future;
@@ -12,11 +13,12 @@ use rmcp::transport::Transport;
 use tokio::io::AsyncBufReadExt;
 use tokio::io::AsyncWriteExt;
 use tokio::io::BufReader;
-use tokio::process::ChildStdin;
-use tokio::process::ChildStdout;
 use tokio::sync::Mutex;
 use tracing::debug;
 use tracing::warn;
+
+use crate::local_child::ChildStdin;
+use crate::local_child::ChildStdout;
 
 /// Match the existing executor stdio transport and the production MCP limit.
 pub(crate) const MAX_MCP_STDIO_LINE_BYTES: usize = 8 * 1024 * 1024;

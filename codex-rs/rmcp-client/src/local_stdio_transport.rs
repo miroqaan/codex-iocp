@@ -1,3 +1,4 @@
+// Modified by miroqaan: Windows MCP IOCP stdio patch, 2026-09-15.
 //! Protocol framing and child lifetime for locally spawned MCP servers.
 //!
 //! Process creation is platform-specific; protocol selection and shutdown are shared.
@@ -12,13 +13,13 @@ use rmcp::service::RxJsonRpcMessage;
 use rmcp::service::TxJsonRpcMessage;
 use rmcp::transport::Transport;
 use rmcp::transport::async_rw::AsyncRwTransport;
-use tokio::process::ChildStderr;
-use tokio::process::ChildStdin;
-use tokio::process::ChildStdout;
 use tokio::process::Command;
 
 use crate::bounded_stdio_transport::BoundedStdioTransport;
 use crate::local_child;
+use crate::local_child::ChildStderr;
+use crate::local_child::ChildStdin;
+use crate::local_child::ChildStdout;
 use crate::local_child::LocalChild;
 use crate::protocol_mode::McpProtocolMode;
 
