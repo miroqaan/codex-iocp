@@ -1,3 +1,18 @@
+> **Unofficial fork — Windows MCP IOCP patch.**
+> This repository is an unofficial source snapshot of [openai/codex](https://github.com/openai/codex)
+> at tag `rust-v0.154.0-alpha.6.2` (commit `b5bffd3e`) with a patch that moves the parent side of
+> locally spawned MCP server stdio on Windows onto IOCP-backed named pipes, so idle pipe reads stop
+> occupying Tokio's shared blocking pool. It is not affiliated with or endorsed by OpenAI.
+>
+> The patch was written with AI assistance and has **not** been independently code-reviewed. Treat it
+> as experimental. See [IOCP-PATCH.md](IOCP-PATCH.md) for the change, validation notes and the list of
+> modified files, and [packaging/windows-iocp](packaging/windows-iocp) for the launcher scripts
+> (Korean guide: [설치안내.md](packaging/windows-iocp/설치안내.md)).
+>
+> The original README follows.
+
+---
+
 <p align="center"><strong>Codex CLI</strong> is a coding agent from OpenAI that runs locally on your computer.
 <p align="center">
   <img src="https://github.com/openai/codex/blob/main/.github/codex-cli-splash.png" alt="Codex CLI splash" width="80%" />
