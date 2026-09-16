@@ -1,0 +1,51 @@
+{
+  "backendVersion": "codex-cli 0.154.0-alpha.6.2",
+  "sourceCommit": "b5bffd3ec4db487e7e3dec59663875b0ef7b72ca",
+  "patchedSha256": "67209BE0A75C1D71EDE0F1739AEA7A3C98B8554544C5C1D6B528797ACBE11CDB",
+  "scripts": [
+    {
+      "name": "Install.ps1",
+      "sha256": "88F9513C4BD50F3A7190D10AE5AF21306A364DAD48170209AAA45161B03057C9"
+    },
+    {
+      "name": "Launch.ps1",
+      "sha256": "AE4BE1DA8C6887CD16AAB425BCFD73D5F510AC7B0CC5FBC2E0BF4056D3097933"
+    },
+    {
+      "name": "Uninstall.ps1",
+      "sha256": "8614BD99FB1CA161C8BFB796669014058DCBCBA39A23E068BF39BE28E444AC75"
+    },
+    {
+      "name": "Compatibility.ps1",
+      "sha256": "792AD90AC78DAD0DD5D941FB188C4F390E7B544262233578927FBF247F488AB7"
+    }
+  ],
+  "schemaVersion": 2,
+  "packageRevision": "iocp-allowlist-1",
+  "approvedCombinations": [
+    {
+      "packageFullName": "OpenAI.Codex_26.908.4834.0_x64__2p2nqsd0c76g0",
+      "backendVersion": "codex-cli 0.154.0-alpha.6.2",
+      "patchedSha256": "67209BE0A75C1D71EDE0F1739AEA7A3C98B8554544C5C1D6B528797ACBE11CDB",
+      "verifiedAt": "2026-09-13",
+      "officialArtifacts": [
+        {
+          "name": "codex.exe",
+          "sha256": "081E4DE4BE8E38FAC6ED4D95E3B1A0B9F6D31C090DDC36E1696B349FE406F575"
+        },
+        {
+          "name": "codex-code-mode-host.exe",
+          "sha256": "FDF360C3A02ADCE2A29272357D61681BDDDC2AB9828A5FA615C4528E4384A23E"
+        },
+        {
+          "name": "codex-command-runner.exe",
+          "sha256": "DFAA6A729DFCAC4A1BFCDCB47CF42D1B3662848E31CBD8420ECC3EABBB014A31"
+        },
+        {
+          "name": "codex-windows-sandbox-setup.exe",
+          "sha256": "F10E0A6D40C3BCE4E65FD0A5C2550965B6E709C330711D7BE5C918AA41579546"
+        }
+      ]
+    }
+  ]
+}

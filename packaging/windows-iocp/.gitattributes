@@ -1,0 +1,4 @@
+# Preserve release script bytes: manifest hashes cover exact file contents.
+*.ps1 -text
+*.cmd -text
+manifest.json -text
