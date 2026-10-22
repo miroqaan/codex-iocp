@@ -1,3 +1,4 @@
+// Modified by miroqaan: Windows MCP IOCP transport for Codex 0.163.0.
 //! Protocol framing and child lifetime for locally spawned MCP servers.
 //!
 //! Process creation is platform-specific; protocol selection and shutdown are shared.
@@ -6,6 +7,9 @@ use std::future::Future;
 use std::io;
 use std::time::Duration;
 
+use crate::local_child::ChildStderr;
+use crate::local_child::ChildStdin;
+use crate::local_child::ChildStdout;
 use codex_utils_pty::Command;
 use futures::FutureExt;
 use rmcp::service::RoleClient;
@@ -13,16 +17,13 @@ use rmcp::service::RxJsonRpcMessage;
 use rmcp::service::TxJsonRpcMessage;
 use rmcp::transport::Transport;
 use rmcp::transport::async_rw::AsyncRwTransport;
-use tokio::process::ChildStderr;
-use tokio::process::ChildStdin;
-use tokio::process::ChildStdout;
 
 use crate::bounded_stdio_transport::BoundedStdioTransport;
+use crate::local_child::LocalChild;
 use crate::protocol_mode::McpProtocolMode;
-use codex_utils_pty::Child;
 
 pub(super) struct LocalStdioTransport {
-    child: Box<Child>,
+    child: Box<LocalChild>,
     transport: StdioTransport,
 }
 
@@ -39,7 +40,7 @@ impl LocalStdioTransport {
         program_name: String,
         protocol_mode: McpProtocolMode,
     ) -> io::Result<(Self, Option<ChildStderr>)> {
-        let mut child = command.spawn()?;
+        let mut child = crate::local_child::spawn(command)?;
         let stdin = child
             .stdin
             .take()

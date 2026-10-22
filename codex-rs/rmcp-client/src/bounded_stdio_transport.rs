@@ -1,9 +1,12 @@
+// Modified by miroqaan: Windows MCP IOCP transport for Codex 0.163.0.
 //! Bounded, compatibility-aware transport for modern locally spawned MCP servers.
 
 use std::future::Future;
 use std::io;
 use std::sync::Arc;
 
+use crate::local_child::ChildStdin;
+use crate::local_child::ChildStdout;
 use memchr::memchr;
 use rmcp::service::RoleClient;
 use rmcp::service::RxJsonRpcMessage;
@@ -12,8 +15,6 @@ use rmcp::transport::Transport;
 use tokio::io::AsyncBufReadExt;
 use tokio::io::AsyncWriteExt;
 use tokio::io::BufReader;
-use tokio::process::ChildStdin;
-use tokio::process::ChildStdout;
 use tokio::sync::Mutex;
 use tracing::debug;
 use tracing::warn;

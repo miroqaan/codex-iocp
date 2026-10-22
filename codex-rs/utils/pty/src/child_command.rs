@@ -1,3 +1,4 @@
+// Modified by miroqaan: Windows MCP IOCP transport for Codex 0.163.0.
 //! Explicit local launch settings shared by native and Tokio process creation.
 //!
 //! The wrapped Tokio command is private: callers cannot install callbacks or
@@ -242,6 +243,24 @@ impl Command {
     #[cfg(windows)]
     pub fn prepare_suspended_spawn(&mut self, job: &crate::JobObject) {
         job.prepare_suspended_spawn(&mut self.inner);
+    }
+
+    /// Launch with caller-owned Windows stdio, retaining environment, creation flags,
+    /// Job Object preparation and kill-on-drop. The caller owns the parent pipe ends.
+    #[cfg(windows)]
+    pub fn spawn_with_stdio(
+        mut self,
+        stdin: TokioStdio,
+        stdout: TokioStdio,
+        stderr: TokioStdio,
+    ) -> io::Result<Child> {
+        self.inner.stdin(stdin).stdout(stdout).stderr(stderr);
+        Ok(Child {
+            stdin: None,
+            stdout: None,
+            stderr: None,
+            inner: ChildKind::Tokio(self.inner.spawn()?),
+        })
     }
 
     /// Reject original inputs that std replaced with a NUL-free placeholder.
