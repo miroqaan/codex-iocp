@@ -308,3 +308,91 @@ async fn local_stdio_shutdown_terminates_descendants_after_server_exit() -> anyh
     }
     Ok(())
 }
+
+/// Quiet stdout and stderr must not occupy the runtime's shared blocking pool.
+#[cfg(windows)]
+#[test]
+fn idle_mcp_stdio_does_not_exhaust_tokio_blocking_pool() -> anyhow::Result<()> {
+    let server = codex_utils_cargo_bin::cargo_bin("test_stdio_server")?;
+    let runtime = tokio::runtime::Builder::new_multi_thread()
+        .worker_threads(2)
+        .max_blocking_threads(8)
+        .enable_all()
+        .build()?;
+    let result = runtime.block_on(async {
+        let launcher = Arc::new(LocalStdioServerLauncher::new(std::env::current_dir()?));
+        let mut clients = Vec::new();
+        let result = tokio::time::timeout(Duration::from_secs(30), async {
+            for mode in [
+                McpProtocolMode::Legacy,
+                McpProtocolMode::V20260728,
+                McpProtocolMode::Legacy,
+                McpProtocolMode::V20260728,
+            ] {
+                let env = (mode == McpProtocolMode::V20260728).then(|| {
+                    HashMap::from([(
+                        OsString::from("CODEX_MCP_PROTOCOL_VERSION"),
+                        OsString::from("2026-07-28"),
+                    )])
+                });
+                let client = Arc::new(
+                    RmcpClient::new_stdio_client_with_protocol_mode(
+                        server.clone().into(),
+                        Vec::new(),
+                        env,
+                        &[],
+                        /*cwd*/ None,
+                        launcher.clone(),
+                        mode,
+                    )
+                    .await?,
+                );
+                clients.push(client.clone());
+                client
+                    .initialize(
+                        InitializeRequestParams::new(
+                            ClientCapabilities::default(),
+                            Implementation::new("idle-stdio-test", "1.0.0"),
+                        )
+                        .with_protocol_version(ProtocolVersion::V_2025_06_18),
+                        Some(Duration::from_secs(5)),
+                        Box::new(|_, _| {
+                            async {
+                                Ok(ElicitationResponse {
+                                    action: ElicitationAction::Decline,
+                                    content: None,
+                                    meta: None,
+                                })
+                            }
+                            .boxed()
+                        }),
+                    )
+                    .await?;
+            }
+            // Allow both output drains to settle into their next, quiet read.
+            tokio::time::sleep(Duration::from_millis(250)).await;
+            let sentinel = tokio::task::spawn_blocking(|| ());
+            anyhow::ensure!(
+                tokio::time::timeout(Duration::from_secs(1), sentinel)
+                    .await
+                    .is_ok(),
+                "idle MCP stdout/stderr reads exhausted Tokio's blocking pool"
+            );
+            for client in &clients {
+                client
+                    .list_tools(/*params*/ None, Some(Duration::from_secs(5)))
+                    .await?;
+            }
+            Ok::<_, anyhow::Error>(())
+        })
+        .await
+        .unwrap_or_else(|error| Err(error.into()));
+        // Release pipe reads even on failure, including the unpatched baseline.
+        for client in clients {
+            client.shutdown().await;
+        }
+        result
+    });
+    runtime.shutdown_timeout(Duration::from_secs(5));
+    result
+}

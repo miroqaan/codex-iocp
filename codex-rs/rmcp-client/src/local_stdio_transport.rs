@@ -1,3 +1,4 @@
+// Modified by miroqaan: Windows MCP IOCP transport for Codex 0.167.0.
 //! Protocol framing and child lifetime for locally spawned MCP servers.
 //!
 //! Process creation is platform-specific; protocol selection and shutdown are shared.
@@ -18,13 +19,13 @@ use rmcp::service::TxJsonRpcMessage;
 use rmcp::transport::Transport;
 use rmcp::transport::async_rw::AsyncRwTransport;
 use tokio::io::AsyncRead;
-use tokio::process::ChildStderr;
-use tokio::process::ChildStdin;
 use tokio::sync::oneshot;
 
 use crate::bounded_stdio_transport::BoundedStdioTransport;
+use crate::local_child::ChildStderr;
+use crate::local_child::ChildStdin;
+use crate::local_child::LocalChild as Child;
 use crate::protocol_mode::McpProtocolMode;
-use codex_utils_pty::Child;
 
 pub(super) struct LocalStdioTransport {
     child: Option<Box<Child>>,

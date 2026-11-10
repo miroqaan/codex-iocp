@@ -1,3 +1,4 @@
+// Modified by miroqaan: Windows MCP IOCP transport for Codex 0.167.0.
 //! Launch MCP stdio servers and return the transport rmcp should use.
 //!
 //! This module owns the "where does the server process run?" decision:
@@ -503,7 +504,7 @@ impl LocalStdioServerLauncher {
                 "MCP client is shut down",
             ));
         }
-        let child = command.spawn()?;
+        let child = crate::local_child::spawn(command)?;
         #[cfg(windows)]
         let (child, job) = match job {
             Some(job) => match child
@@ -519,7 +520,7 @@ impl LocalStdioServerLauncher {
                     );
                     drop(child);
                     drop(job);
-                    (build_command().spawn()?, None)
+                    (crate::local_child::spawn(build_command())?, None)
                 }
             },
             None => (child, None),
